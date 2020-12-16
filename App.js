@@ -8,29 +8,36 @@ import MealsNavigator from './navigation/MealsNavigator';
 
 enableScreens();
 
-const fetchFonts = () => {
-  Font.loadAsync({
-    'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
-    'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf')
-  });
+let customFonts = {
+  'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
+  'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf')
 };
 
-export default function App() {
-  const [fontLoaded, setFontLoaded] = useState(false);
+export default class App extends React.Component {
+  state = {
+    fontsLoaded: false,
+  };
 
-  if (!fontLoaded) {
-    return (
-      <AppLoading
-        startAsync={fetchFonts}
-        onFinish={() => setFontLoaded(true)}
-        onError={(err) => console.log(err)}
-      />
-    );
+  async _loadFontsAsync() {
+    await Font.loadAsync(customFonts);
+    this.setState({ fontsLoaded: true });
   }
 
-  return (
-    <MealsNavigator />
-  );
+  componentDidMount() {
+    this._loadFontsAsync();
+  }
+
+  render() {
+    if (this.state.fontsLoaded) {
+      return (
+        <MealsNavigator />
+      );
+    } else {
+      return (
+        <AppLoading />
+      );
+    }
+  }
 }
 
 const styles = StyleSheet.create({
